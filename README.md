@@ -12,10 +12,10 @@ No affiliation or endorsement by Nintendo, Creatures Inc., GAME FREAK, or The Po
 ### Examples
 
 - **Get a random Pokémon trainer:**  
-  [random-pokemon-trainer.vercel.app](random-pokemon-trainer.vercel.app)
+  [https://random-pokemon-trainer.vercel.app](https://random-pokemon-trainer.vercel.app)
 
 - **Get a random Ace Trainer:**  
-  [random-pokemon-trainer.vercel.app/?r=acetrainer](random-pokemon-trainer.vercel.app?r=acetrainer)
+  [https://random-pokemon-trainer.vercel.app/?r=acetrainer](https://random-pokemon-trainer.vercel.app?r=acetrainer)
 
 - **Get a random Ace Trainer, excluding gen1 and couple:**  
-  [random-pokemon-trainer.vercel.app/?e=.*gen1,.*couple&r=acetrainer](random-pokemon-trainer.vercel.app/?e=.*gen1,.*couple&r=acetrainer)
+  [https://random-pokemon-trainer.vercel.app/?e=.*gen1,.*couple&r=acetrainer](https://random-pokemon-trainer.vercel.app/?e=.*gen1,.*couple&r=acetrainer)
