@@ -44,13 +44,18 @@ export default async function handler(req, res) {
     const fileContents = await fs.readFile(filePath, 'utf-8');
     const images = JSON.parse(fileContents);
 
-    const filtered = images.filter(img => {
-      if (!regExp.test(img)) return false;
-      for (const ex of excludeRegexes) {
-        if (ex.test(img)) return false;
-      }
-      return true;
-    });
+    let filtered;
+    if (e === '' && r === '.*') {
+      filtered = images;
+    } else {
+      filtered = images.filter(img => {
+        if (!regExp.test(img)) return false;
+        for (const ex of excludeRegexes) {
+          if (ex.test(img)) return false;
+        }
+        return true;
+      });
+    }
 
     if (filtered.length === 0) {
       res.status(404).send('No matching images found.');
