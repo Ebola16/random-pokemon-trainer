@@ -63,7 +63,7 @@ export default async function handler(req, res) {
     }
 
     const randomImage = filtered[Math.floor(Math.random() * filtered.length)];
-    const redirectUrl = `https://play.pokemonshowdown.com/sprites/trainers/${encodeURIComponent(randomImage)}.png`;
+    const redirectUrl = `https://play.pokemonshowdown.com/sprites/trainers/${encodeURIComponent(randomImage)}`;
 
     res.writeHead(302, { Location: redirectUrl });
     res.end();

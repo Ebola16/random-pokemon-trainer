@@ -1,0 +1,73 @@
+name: Update Trainer Sprites List
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 8 * * *"  # daily at 08:00 UTC
+
+jobs:
+  update-trainers:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Get latest trainer IDs
+        id: trainer_sprites
+        shell: bash
+        run: |
+          # Download the trainers page
+          page=$(curl -Ls https://play.pokemonshowdown.com/sprites/trainers/index.php)
+
+          # Extract all <figure id="..."> values, sort alphabetically (case-insensitive), remove duplicates
+          ids=$(echo "$page" | grep -oP '(?<=<figure id=")[^"]+' | sort -f | uniq)
+
+          # Convert to compact JSON array (single line)
+          json=$(printf '%s\n' "$ids" | jq -R . | jq -s -c .)
+
+          echo "Found $(echo "$ids" | wc -l) trainer entries."
+          echo "First few: $(echo "$ids" | head -n 5)"
+
+          # Set JSON as output for later steps
+          echo "json=$json" >> "$GITHUB_OUTPUT"
+
+      - name: Check existing data/images.json
+        id: check_existing
+        shell: bash
+        run: |
+          if [ -f data/images.json ]; then
+            existing=$(jq -c . data/images.json)
+          else
+            existing="[]"
+          fi
+          echo "existing=$existing" >> "$GITHUB_OUTPUT"
+
+      - name: Compare and update if changed
+        id: compare
+        shell: bash
+        run: |
+          new_json='${{ steps.trainer_sprites.outputs.json }}'
+          existing_json='${{ steps.check_existing.outputs.existing }}'
+
+          if [ "$new_json" != "$existing_json" ]; then
+            echo "Trainer list changed — updating data/images.json"
+            mkdir -p data
+            echo "$new_json" | jq . > data/images.json
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "Trainer list unchanged."
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Commit and push if changed
+        if: steps.compare.outputs.changed == 'true'
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          date_str=$(date -u +"%Y-%m-%d")
+          git add data/images.json
+          git commit -m "Update trainer sprites list ($date_str)"
+          git push origin main
